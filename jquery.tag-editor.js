@@ -155,6 +155,8 @@
                     }
                 });
 
+				window.clicks = 0;
+				window.selects = 0;
             ed.on('click', '.tag-editor-tag', function(e){
                 // delete on right click or ctrl+click -> exit
                 if (o.clickDelete && (e.ctrlKey || e.which > 1)) return false;
@@ -166,10 +168,17 @@
                         input = $(this).html('<input type="text" maxlength="'+o.maxLength+'" value="'+tag+'">').addClass('active').find('input');
                         input.data('old_tag', tag).focus().autoGrowInput().trigger('autogrow').caret(caret_pos);
                     if (o.autocomplete) {
-                        var aco = o.autocomplete;
+						console.log("click #" + window.clicks++);
+						
+                        var aco = o.autocomplete; 
                         // extend user provided autocomplete select method
-                        var ac_select = 'select'  in aco ? o.autocomplete.select : '';
-                        aco.select = function(){ if (ac_select) ac_select(); setTimeout(function(){ $('.active', ed).find('input').trigger('autogrow'); }, 20); };
+                        var ac_select = 'select'  in aco ? o.autocomplete.select : ''; // aco might not have select now, but it sure will next time this executes
+						
+						// this line puts 'select in aco (and aco IS o.autocomplete, which gets used next time ed.on("click") is called.
+                        aco.select = function(){ 
+							console.log("select #" + window.selects++);
+							if (ac_select) ac_select(); setTimeout(function(){ $('.active', ed).find('input').trigger('autogrow'); }, 20); };
+						
                         input.autocomplete(aco);
                     }
                 }
